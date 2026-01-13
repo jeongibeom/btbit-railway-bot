@@ -25,15 +25,21 @@ BYBIT_API_SECRET = os.environ.get("BYBIT_API_SECRET", "")
 
 def bybit_public(endpoint, params=None):
     """Bybit 공개 API"""
-    url = f"https://api.bybit.com{endpoint}"
-    response = requests.get(url, params=params, timeout=10)
-    logger.info(f"Bybit status: {response.status_code}")
-    if response.status_code != 200:
-        raise Exception(f"HTTP {response.status_code}: {response.text[:200]}")
-    data = response.json()
-    if data.get("retCode") != 0:
-        raise Exception(data.get("retMsg"))
-    return data.get("result", {})
+    try:
+        url = f"https://api.bybit.com{endpoint}"
+        logger.info(f"Bybit 요청: {url}")
+        response = requests.get(url, params=params, timeout=30)
+        logger.info(f"Bybit 응답: {response.status_code}")
+        logger.info(f"Bybit 내용: {response.text[:500]}")
+        if response.status_code != 200:
+            raise Exception(f"HTTP {response.status_code}")
+        data = response.json()
+        if data.get("retCode") != 0:
+            raise Exception(data.get("retMsg"))
+        return data.get("result", {})
+    except Exception as e:
+        logger.error(f"Bybit 에러: {e}")
+        raise
 
 
 def bybit_private(endpoint, params):
