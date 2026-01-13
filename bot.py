@@ -27,6 +27,9 @@ def bybit_public(endpoint, params=None):
     """Bybit 공개 API"""
     url = f"https://api.bybit.com{endpoint}"
     response = requests.get(url, params=params, timeout=10)
+    logger.info(f"Bybit status: {response.status_code}")
+    if response.status_code != 200:
+        raise Exception(f"HTTP {response.status_code}: {response.text[:200]}")
     data = response.json()
     if data.get("retCode") != 0:
         raise Exception(data.get("retMsg"))
